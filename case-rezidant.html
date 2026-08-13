@@ -1,0 +1,526 @@
+<title>Rezidant — Timmy Labode</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Case study: designing Rezidant, a property management platform for admins, landlords, and tenants.">
+<link rel="icon" type="image/png" sizes="512x512" href="images/favicon-512.png">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/favicon-180.png">
+<meta property="og:title" content="Rezidant — Timmy Labode">
+<meta property="og:description" content="Case study: designing Rezidant, a property management platform for admins, landlords, and tenants.">
+<meta property="og:image" content="images/og-thumbnail.jpg">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Rezidant — Timmy Labode">
+<meta name="twitter:description" content="Case study: designing Rezidant, a property management platform for admins, landlords, and tenants.">
+<meta name="twitter:image" content="images/og-thumbnail.jpg">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --bg:#FFFFFF; --bg-soft:#F6F6F4; --ink:#111214; --ink-soft:#6B6C70; --ink-faint:#A2A3A7;
+    --border:#EAEAE8; --accent:#0066FF; --nav-bg:rgba(255,255,255,0.72); --live:#1C9A5B; color-scheme:light;
+    --ease-out:cubic-bezier(.23,1,.32,1); --ease-in-out:cubic-bezier(.77,0,.175,1);
+    --shadow-sm:0 1px 2px rgba(17,18,20,0.04),0 2px 8px -2px rgba(17,18,20,0.06);
+    --shadow-md:0 12px 28px -10px rgba(17,18,20,0.18),0 2px 8px -2px rgba(17,18,20,0.08);
+  }
+  html[data-theme="dark"]{
+    --bg:#0F1012; --bg-soft:#18191C; --ink:#F2F2F1; --ink-soft:#A6A7AB; --ink-faint:#6C6D71;
+    --border:#28292D; --accent:#409CFF; --nav-bg:rgba(15,16,18,0.62); --live:#3FCB82; color-scheme:dark;
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.3),0 2px 8px -2px rgba(0,0,0,0.4);
+    --shadow-md:0 12px 28px -10px rgba(0,0,0,0.55),0 2px 8px -2px rgba(0,0,0,0.4);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;transition:background-color .4s var(--ease-in-out),color .4s var(--ease-in-out);}
+  a{color:inherit;text-decoration:none;}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px;}
+  .mono,.eyebrow{font-feature-settings:"tnum" 1,"case" 1;}
+  h1,h2,h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;margin:0;font-optical-sizing:auto;letter-spacing:-0.015em;}
+  img{max-width:100%;display:block;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);}
+
+  /* nav */
+  .nav{position:sticky;top:0;z-index:50;background:var(--nav-bg);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--border);}
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:70px;}
+  .nav-id{display:flex;align-items:center;gap:10px;}
+  .nav-id img{width:34px;height:34px;border-radius:50%;object-fit:cover;}
+  .nav-id span{font-weight:600;font-size:14px;}
+  .back-link{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);transition:color .2s var(--ease-out),transform .2s var(--ease-out);}
+  .back-link:hover{color:var(--accent);transform:translateX(-2px);}
+  .nav-right{display:flex;align-items:center;gap:12px;}
+  .status-chip{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.04em;}
+  .status-chip .sdot{width:6px;height:6px;border-radius:50%;}
+  .social-icon img{width:20px;height:20px;object-fit:contain;display:block;}
+  .theme-toggle{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);padding:0;cursor:pointer;background:transparent;color:var(--ink-soft);flex-shrink:0;transition:border-color .2s var(--ease-out),color .2s var(--ease-out),transform .35s var(--ease-in-out);}
+  .theme-toggle:hover{border-color:var(--ink);color:var(--ink);transform:rotate(20deg);}
+  .theme-toggle svg{width:16px;height:16px;}
+  .theme-toggle .icon-moon{display:none;}
+  html[data-theme="dark"] .theme-toggle .icon-sun{display:none;}
+  html[data-theme="dark"] .theme-toggle .icon-moon{display:block;}
+
+  /* stepper */
+  .stepper{position:sticky;top:70px;z-index:40;background:var(--bg);border-bottom:1px solid var(--border);overflow-x:auto;white-space:nowrap;-ms-overflow-style:none;scrollbar-width:none;}
+  .stepper::-webkit-scrollbar{display:none;}
+  .stepper .wrap{display:flex;gap:0;padding:0 32px;}
+  .stepper a{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-faint);padding:14px 16px;border-bottom:2px solid transparent;flex-shrink:0;transition:color .2s var(--ease-out),border-color .2s var(--ease-out);}
+  .stepper a:hover{color:var(--ink);}
+  .stepper a.active{color:var(--accent);border-color:var(--accent);}
+
+  /* hero */
+  .hero-outer{padding:56px 0 0;}
+  .hero-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:48px;align-items:start;}
+  .hero-grid h1{font-size:clamp(32px,4.6vw,50px);line-height:1.03;letter-spacing:-0.025em;margin:14px 0 18px;}
+  .case-lede{font-size:15.5px;line-height:1.7;color:var(--ink-soft);max-width:56ch;margin-bottom:12px;}
+  .case-tags{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 24px;}
+  .case-tags span{font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);border:1px solid var(--border);padding:5px 9px;border-radius:999px;}
+  .btn{font-family:'IBM Plex Mono',monospace;font-size:12px;padding:12px 18px;border:1px solid var(--ink);display:inline-block;border-radius:999px;transition:background .2s var(--ease-out),color .2s var(--ease-out),transform .15s var(--ease-out),box-shadow .2s var(--ease-out);}
+  .btn:active{transform:scale(0.97);}
+  .btn.solid{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:var(--shadow-sm);}
+  .btn.solid:hover{background:#0052CC;border-color:#0052CC;box-shadow:var(--shadow-md);transform:translateY(-1px);}
+  .props-panel{border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm);}
+  .props-row{display:flex;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border);font-size:13px;}
+  .props-row:last-child{border-bottom:none;}
+  .props-row .k{color:var(--ink-faint);font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.04em;}
+  .props-row .v{font-weight:500;text-align:right;}
+  .cover-frame{margin-top:32px;border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-md);}
+  .cover-frame img{width:100%;display:block;object-fit:cover;max-height:520px;}
+  @media (max-width:820px){ .hero-grid{grid-template-columns:1fr;} }
+
+  /* generic section */
+  .section{padding:64px 0;border-bottom:1px solid var(--border);}
+  .section-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:28px;gap:16px;flex-wrap:wrap;}
+  .section-head h2{font-size:clamp(24px,3.2vw,32px);}
+  .section-head .num{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-faint);}
+  .section p{font-size:14.5px;line-height:1.75;color:var(--ink-soft);max-width:74ch;margin:0 0 12px;}
+  .section p strong{color:var(--ink);font-weight:600;}
+
+  /* two-col problem/goal */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:44px;}
+  @media (max-width:820px){ .two-col{grid-template-columns:1fr;} }
+  .goal-list{list-style:none;margin:0;padding:0;}
+  .goal-list li{font-size:14.5px;color:var(--ink-soft);line-height:1.6;padding:10px 0 10px 20px;border-bottom:1px solid var(--border);position:relative;transition:padding-left .25s var(--ease-out),color .25s var(--ease-out);}
+  .goal-list li:last-child{border-bottom:none;}
+  .goal-list li:hover{padding-left:27px;color:var(--ink);}
+  .goal-list li::before{content:"→";position:absolute;left:0;color:var(--accent);}
+  .goal-list li.placeholder{color:var(--ink-faint);font-style:italic;}
+
+  /* placeholder block */
+  .ph-block{border:1px dashed var(--ink-faint);border-radius:10px;background:var(--bg-soft);padding:40px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;color:var(--ink-faint);}
+  .ph-block .ph-icon{font-size:20px;}
+  .ph-block .ph-text{font-family:'IBM Plex Mono',monospace;font-size:11.5px;max-width:44ch;line-height:1.6;}
+  .ph-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  @media (max-width:720px){ .ph-row{grid-template-columns:1fr;} }
+  .ph-banner{aspect-ratio:21/6;}
+  .ph-square{aspect-ratio:4/3;}
+
+  /* prototype link card */
+  .proto-card{border:1px solid var(--border);border-radius:12px;padding:28px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;background:var(--bg-soft);transition:border-color .3s var(--ease-out),box-shadow .3s var(--ease-out);}
+  .proto-card:hover{border-color:var(--accent);box-shadow:var(--shadow-sm);}
+  .proto-card .p-title{font-size:18px;font-weight:600;margin-bottom:6px;}
+  .proto-card .p-desc{font-size:13px;color:var(--ink-soft);max-width:50ch;}
+
+  /* gallery */
+  .gallery-group-title{font-size:15px;font-weight:600;letter-spacing:-0.01em;margin:36px 0 14px;color:var(--ink);}
+  .gallery-group-title:first-of-type{margin-top:28px;}
+  .gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+  .gallery figure{margin:0;border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;transition:transform .35s var(--ease-out),box-shadow .35s var(--ease-out),border-color .35s var(--ease-out);}
+  .gallery figure:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:var(--ink-faint);}
+  .gallery img{width:100%;display:block;object-fit:cover;transition:transform .5s var(--ease-out);cursor:zoom-in;}
+
+  /* lightbox */
+  .lightbox{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:40px;background:rgba(10,10,11,0);backdrop-filter:blur(0px);opacity:0;pointer-events:none;transition:opacity .3s var(--ease-out),background .3s var(--ease-out),backdrop-filter .3s var(--ease-out);}
+  .lightbox.open{opacity:1;pointer-events:auto;background:rgba(10,10,11,0.86);backdrop-filter:blur(6px);}
+  .lightbox img{max-width:min(92vw,1100px);max-height:86vh;width:auto;border-radius:10px;box-shadow:var(--shadow-md);transform:scale(0.96);transition:transform .3s var(--ease-out);object-fit:contain;display:block;}
+  .lightbox.open img{transform:scale(1);}
+  .lightbox-close{position:absolute;top:22px;right:26px;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.08);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;line-height:1;transition:background .2s var(--ease-out),transform .2s var(--ease-out);}
+  .lightbox-close:hover{background:rgba(255,255,255,0.18);transform:rotate(90deg);}
+  .lightbox-caption{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.75);font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:0.04em;text-align:center;max-width:80vw;}
+  .gallery figure:hover img{transform:scale(1.035);}
+  .gallery .g-wide{grid-column:1 / -1;}
+  .gallery .g-tall img{max-height:640px;object-fit:cover;object-position:top;}
+  .gallery .g-flow{background:var(--bg-soft);}
+  .gallery .g-flow img{object-fit:contain;max-height:420px;padding:14px;background:var(--bg-soft);cursor:zoom-in;}
+  .gallery .g-flow:hover img{transform:none;}
+  .gallery figcaption{position:absolute;bottom:0;left:0;background:rgba(17,18,20,0.82);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.04em;padding:5px 9px;}
+  @media (max-width:720px){ .gallery{grid-template-columns:1fr;} }
+
+  /* callout */
+  .callout{border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:10px;padding:18px 22px;background:var(--bg-soft);margin-top:18px;transition:border-color .3s var(--ease-out),box-shadow .3s var(--ease-out);}
+  .callout:hover{box-shadow:var(--shadow-sm);}
+  .callout .c-label{font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent);margin-bottom:8px;}
+  .callout p{margin:0;font-size:13.5px;}
+
+  /* reflection */
+  .reflect{background:var(--bg-soft);border:1px solid var(--border);border-radius:12px;padding:32px;}
+  .reflect p{font-size:15px;color:var(--ink);max-width:76ch;}
+
+  /* prevnext */
+  .prevnext{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .pn-card{border:1px solid var(--border);border-radius:12px;padding:20px;transition:border-color .3s var(--ease-out),background .3s var(--ease-out),transform .3s var(--ease-out),box-shadow .3s var(--ease-out);}
+  .pn-card:hover{border-color:var(--accent);background:var(--bg-soft);transform:translateY(-3px);box-shadow:var(--shadow-md);}
+  .pn-card .name{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:18px;}
+  @media (max-width:720px){ .prevnext{grid-template-columns:1fr;} }
+
+  /* footer (shared with homepage) */
+  .footer{padding:80px 0 40px;}
+  .footer-cta{text-align:center;margin-bottom:56px;}
+  .footer-cta h2{font-size:clamp(32px,5.6vw,56px);letter-spacing:-0.01em;}
+  .footer-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:32px;padding-bottom:32px;border-bottom:1px solid var(--border);}
+  .footer-col .eyebrow{margin-bottom:14px;}
+  .footer-col a{display:block;font-size:14px;color:var(--ink-soft);padding:6px 0;transition:color .2s var(--ease-out),transform .2s var(--ease-out);}
+  .footer-col a:hover{color:var(--ink);transform:translateX(2px);}
+  .footer-email{display:inline-block;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(20px,3vw,26px);font-weight:600;color:var(--ink);margin-top:4px;transition:color .2s var(--ease-out),transform .2s var(--ease-out);}
+  .footer-email:hover{color:var(--accent);transform:translateX(3px);}
+  .avail{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:12.5px;color:var(--ink-soft);}
+  .avail .dot{width:7px;height:7px;border-radius:50%;background:var(--live);display:inline-block;}
+  @media (max-width:760px){ .footer-grid{grid-template-columns:1fr;} }
+  .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:24px;font-size:12px;color:var(--ink-faint);flex-wrap:wrap;gap:10px;}
+</style>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="back-link" href="index.html"><span class="mono">←</span> Timmy Labode</a>
+    <div class="nav-right">
+      <span class="status-chip" style="color:var(--live);"><span class="sdot" style="background:var(--live);"></span>Live</span>
+      <a class="social-icon" href="https://www.linkedin.com/in/oluwatimilehinlabode/" target="_blank" rel="noopener" aria-label="LinkedIn"><img src="images/linkedin-icon.png" alt="LinkedIn"></a>
+      <a class="social-icon" href="mailto:labodetimi@gmail.com" aria-label="Email"><img src="images/email-icon.png" alt="Email"></a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="stepper">
+  <div class="wrap">
+      <a href="#problem" data-step="problem">01 Problem</a>
+      <a href="#research" data-step="research">02 Research</a>
+      <a href="#synthesis" data-step="synthesis">03 Synthesis</a>
+      <a href="#flows" data-step="flows">04 User Flows</a>
+      <a href="#final-ui" data-step="final-ui">05 Final UI</a>
+      <a href="#impact" data-step="impact">06 Impact</a>
+  </div>
+</div>
+
+<div class="hero-outer" id="top">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Live · Product Design</div>
+        <h1>Simplifying rentals & property management across Africa.</h1>
+        <p class="case-lede">Rezidant replaces fragmented tools, manual processes, and endless back-and-forth
+            communication with a single, connected platform that brings tenants, landlords, and
+            property managers into one shared experience — from discovery through long-term
+            management.</p>
+        <div class="case-tags">
+            <span>Product Design</span>
+            <span>Design Systems</span>
+            <span>Team Leadership</span>
+        </div>
+        <a class="btn solid" href="https://www.rezidant.com" target="_blank" rel="noopener">Visit Live Site ↗</a>
+      </div>
+      <div class="props-panel">
+          <div class="props-row"><span class="k">Year</span><span class="v">2025 — Ongoing</span></div>
+          <div class="props-row"><span class="k">Company</span><span class="v">Rezidant</span></div>
+          <div class="props-row"><span class="k">Role</span><span class="v">Lead Product Designer</span></div>
+          <div class="props-row"><span class="k">Team</span><span class="v">2 Designers</span></div>
+          <div class="props-row"><span class="k">Status</span><span class="v">Live</span></div>
+      </div>
+    </div>
+    <div class="cover-frame"><img src="images/rezidant-cover.gif" alt="Rezidant product screens animating across admin, property manager, and tenant dashboards"></div>
+  </div>
+</div>
+
+<section class="section" id="problem">
+  <div class="wrap">
+    <div class="section-head"><span class="num">01</span><h2>The Problem</h2></div>
+    <div class="two-col">
+      <div>
+          <p>Renting and property management workflows are often messy and inefficient.</p>
+          <p>Tenants struggle to find verified listings, track payments, or get updates on maintenance issues. Landlords manage listings and tenant communication with little visibility or structure. Property managers deal with manual records, poor communication, and limited insight into their portfolios.</p>
+          <p>These disconnected experiences lead to delays, misunderstandings, and unnecessary stress for everyone involved.</p>
+      </div>
+      <div>
+        <ul class="goal-list">
+            <li>Centralizes property and tenant information</li>
+            <li>Improves communication across all stakeholders</li>
+            <li>Simplifies payments, leases, and maintenance tracking</li>
+            <li>Provides real-time visibility and insights</li>
+            <li>Remains intuitive and easy to use, regardless of role</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="research">
+  <div class="wrap">
+    <div class="section-head"><span class="num">02</span><h2>Research</h2></div>
+    <div class="two-col">
+      <div>
+        <p>To get past assumptions about what tenants, landlords, and property managers actually needed, I started with direct conversations rather than a single stakeholder's view of the problem.</p>
+        <p>I ran in-person interviews across all three user types: 2 tenants, 2 property managers, and 1 landlord, each walking through how they currently handle rent, leases, maintenance, and communication. That was paired with a review of comparable rental and property management platforms already on the market, and with domain knowledge from working inside the property management space day to day.</p>
+      </div>
+      <div>
+        <ul class="goal-list">
+            <li>In-person interviews: 2 tenants, 2 property managers, 1 landlord</li>
+            <li>Competitive review of existing rental & property management platforms</li>
+            <li>Domain knowledge from working directly in the property management space</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="synthesis">
+  <div class="wrap">
+    <div class="section-head"><span class="num">03</span><h2>Synthesis</h2></div>
+    <div class="two-col">
+      <div>
+        <p>The interviews split cleanly into two sets of friction, one for landlords and property managers, one for tenants. Mapping out each group's current-state journey made the priority order clear.</p>
+        <p>For landlords and property managers, the biggest friction points were collecting rent payments, tracking tenancy agreements, and screening tenants, all handled manually with little structure. For tenants, the friction was upfront rent payments, and having no clear channel to raise maintenance requests or communicate with landlords and property managers.</p>
+      </div>
+      <div>
+        <ul class="goal-list">
+            <li>Rent collection & tracking (landlords, property managers)</li>
+            <li>Tenancy agreement management (landlords, property managers)</li>
+            <li>Tenant screening (landlords, property managers)</li>
+            <li>Upfront rent payments (tenants)</li>
+            <li>Maintenance requests & communication (tenants)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="flows">
+  <div class="wrap">
+    <div class="section-head"><span class="num">04</span><h2>User Flows</h2></div>
+    <p>Before locking the final screens, I mapped the end-to-end flow for each of the three roles, admin/ops, property manager, and tenant, covering every decision point, system action, and notification behind each path. Click a diagram to zoom in.</p>
+    <div class="gallery">
+        <figure class="g-wide g-flow"><img loading="lazy" src="images/rezidant-flow-admin.png" alt="Rezidant admin and ops full lifecycle flow diagram covering verification, financing, disputes, and recovery"><figcaption>Admin / Ops: Full lifecycle flow</figcaption></figure>
+        <figure class="g-wide g-flow"><img loading="lazy" src="images/rezidant-flow-pm.png" alt="Rezidant property manager end-to-end flow diagram"><figcaption>Property Manager: End-to-end flow</figcaption></figure>
+        <figure class="g-wide g-flow"><img loading="lazy" src="images/rezidant-flow-tenant.png" alt="Rezidant tenant end-to-end flow diagram"><figcaption>Tenant: End-to-end flow</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="final-ui">
+  <div class="wrap">
+    <div class="section-head"><span class="num">05</span><h2>Final UI</h2></div>
+    <p>Three roles, one system. Screens below are grouped by who uses them — admin/ops, property manager & landlord, and tenant — since each role sees a genuinely different product built on the same underlying design language.</p>
+
+    <h3 class="gallery-group-title">Admin screens</h3>
+    <div class="gallery">
+        <figure><img loading="lazy" src="images/rezidant-admin-overview.png" alt="Rezidant super admin overview dashboard with revenue, property manager and tenant stats"><figcaption>Overview dashboard: revenue, active users, and platform-wide stats at a glance</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-admin-property-managers.png" alt="Rezidant super admin property managers list view"><figcaption>Property managers directory: every PM account, their properties, and status</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-admin-user-management.png" alt="Rezidant super admin user management and permission groups screen"><figcaption>User management: role cards and permission groups across the platform</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-admin-tenant-management.png" alt="Rezidant admin tenant management table with wallet balances and lease status"><figcaption>Tenant management: full tenant directory with wallet balance and active-lease status</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-admin-financials.png" alt="Rezidant admin financials screen with CAPEX and OPEX split, reimbursables, and revenue by property"><figcaption>Financials: CAPEX/OPEX split, revenue by property, and reimbursable tracking</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-admin-dispute-management.png" alt="Rezidant admin dispute management screen with resolution stats and case table"><figcaption>Dispute management: open, resolved, and under-review cases in one queue</figcaption></figure>
+    </div>
+
+    <h3 class="gallery-group-title">Property manager & landlord screens</h3>
+    <div class="gallery">
+        <figure><img loading="lazy" src="images/rezidant-property-manager-dashboard.png" alt="Rezidant property manager portfolio dashboard showing occupancy and cashflow"><figcaption>Portfolio dashboard: occupancy, active tenancies, cashflow, and maintenance at a glance</figcaption></figure>
+        <figure class="g-wide"><img loading="lazy" src="images/rezidant-pm-tenant-screening.png" alt="Rezidant property manager tenant screening report showing risk indicators"><figcaption>Tenant screening report: risk indicators, financial health, and a recommendation before approving a tenancy</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-pm-portfolio-grid.png" alt="Rezidant property manager portfolio grid showing managed properties as cards"><figcaption>Portfolio: every managed property as a card, with unit and occupancy counts</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-pm-property-detail.png" alt="Rezidant property detail page with amenities and cover image"><figcaption>Property detail: amenities, cover image, and tabs for units, tenants, and payments</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-pm-add-property.png" alt="Rezidant add property wizard, general information step"><figcaption>Add Property wizard: a guided multi-step flow from general info through amenities and media</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-pm-portfolio-invites.png" alt="Rezidant property manager tenant invites list with lease and payment status"><figcaption>Tenant invites: tracking each invite from sent through lease acknowledged and rent paid</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-pm-financials.png" alt="Rezidant property manager financials screen with accounting, wallet, expenses, and invoices tabs"><figcaption>Financials: accounting, expenses, revenue by property, and downloadable reports</figcaption></figure>
+        <figure class="g-tall"><img loading="lazy" src="images/rezidant-pm-maintenance.png" alt="Rezidant property manager mobile maintenance screen with work orders and OPEX/CAPEX totals"><figcaption>Maintenance (mobile): work orders with OPEX/CAPEX totals for the property manager on the move</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-pm-messaging.png" alt="Rezidant property manager messaging screen with tenant chat list"><figcaption>Messaging: direct chat with tenants plus a community tab for building-wide updates</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-pm-documents.png" alt="Rezidant property manager document manager with lease agreements and invoices"><figcaption>Document manager: lease agreements, cover images, and invoices, organized per property</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-pm-account-settings.png" alt="Rezidant property manager account settings screen"><figcaption>Account settings: profile, business type, and payout account setup</figcaption></figure>
+    </div>
+
+    <h3 class="gallery-group-title">Tenant screens</h3>
+    <div class="gallery">
+        <figure class="g-wide"><img loading="lazy" src="images/rezidant-tenant-home-dashboard.png" alt="Rezidant tenant home dashboard on desktop"><figcaption>Home dashboard (desktop): lease status, quick actions, and upcoming payments</figcaption></figure>
+        <figure class="g-tall"><img loading="lazy" src="images/rezidant-tenant-mobile-dashboard.png" alt="Rezidant tenant home dashboard on mobile"><figcaption>Home dashboard (mobile): the same experience built mobile-first for day-to-day use</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-tenant-credit-score.png" alt="Rezidant tenant credit score and verification report"><figcaption>Screening: credit score, verification status, and financial-health summary shown to the tenant</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-tenant-lease-agreement.png" alt="Rezidant tenant reviewing and signing a digital lease agreement"><figcaption>Digital lease agreement: reviewing and signing a lease directly in-app</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-tenant-invited-property-map.png" alt="Rezidant tenant viewing an invited property's location on a map with nearby landmarks"><figcaption>Invited property: location on a map with nearby landmarks, alongside price and amenities</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-tenant-financials.png" alt="Rezidant tenant financials screen with invoices and outstanding balances"><figcaption>Financials: invoices, outstanding balances, and a one-tap Pay Now on each line item</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-tenant-maintenance.png" alt="Rezidant tenant maintenance request screen with pending, in-progress, and resolved requests"><figcaption>Maintenance requests: submitting and tracking a request from pending through resolved</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-tenant-messaging.png" alt="Rezidant tenant messaging screen with property manager chat list"><figcaption>Messaging: direct line to the property manager, plus a community tab</figcaption></figure>
+        <figure><img loading="lazy" src="images/rezidant-tenant-account-settings.png" alt="Rezidant tenant account settings and security screen"><figcaption>Account & security: password, login sessions, and device history</figcaption></figure>
+        <figure class="g-tall"><img loading="lazy" src="images/rezidant-tenant-kyc-success.png" alt="Rezidant tenant mobile KYC verification success screen"><figcaption>KYC verification (mobile): confirmation screen at the end of identity verification</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="role">
+  <div class="wrap">
+    <div class="section-head"><h2>My Role</h2></div>
+          <p>
+          As the <strong>lead product designer</strong> on a two-person design team, I set the
+          overall design direction and did the bulk of the hands-on design work — research,
+          information architecture, and interface — working directly with the founding team and
+          my co-designer to take the platform from concept to a live product now used by tenants,
+          landlords, and property managers.
+        </p>
+          <p>
+          One of the harder calls was designing <strong>three genuinely different experiences</strong>
+          (tenant, landlord, property manager) without fragmenting the product into three separate
+          apps. That meant building a shared design system flexible enough to hold role-specific
+          complexity without losing consistency — and clear enough that both of us on the design
+          side could build within it consistently.
+        </p>
+    <div class="callout">
+      <div class="c-label">Collaboration & Handoff</div>
+      <p>A two-person design team (myself and another product designer) working closely with engineers throughout, not just at handoff. Design QA after implementation, reviewing the build against Figma and resolving inconsistencies directly with engineers, was a core part of getting each release into production.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="component-architecture">
+  <div class="wrap">
+    <div class="section-head"><h2>Component Architecture & Tokens</h2></div>
+    <p>A shared design system held role-specific complexity (tenant, landlord, property manager) without fragmenting into three separate visual languages.</p>
+    <div class="gallery">
+        <figure><img src="images/rezidant-colours.png" alt="Rezidant color tokens"><figcaption>Color tokens</figcaption></figure>
+        <figure><img src="images/rezidant-buttons.png" alt="Rezidant button component sheet"><figcaption>Component sheet: Buttons</figcaption></figure>
+        <figure class="g-wide"><img src="images/rezidant-spacing.png" alt="Rezidant spacing scale"><figcaption>Spacing scale</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="impact">
+  <div class="wrap">
+    <div class="section-head"><span class="num">06</span><h2>Business Impact</h2></div>
+    <ul class="goal-list">
+        <li>Unified three distinct user roles, tenant, landlord, and property manager, into a single coherent product instead of three disconnected tools</li>
+        <li>Delivered as a live product now used by tenants, landlords, and property managers</li>
+        <li>Built and led by a two-person design team, with a shared design system enabling consistent scale across roles</li>
+    </ul>
+  </div>
+</section>
+
+<section class="section" id="reflection">
+  <div class="wrap">
+    <div class="section-head"><h2>Reflection</h2></div>
+    <div class="reflect">
+      <p>
+        Rezidant sharpened how I think about designing for multiple user roles inside one
+        product without fragmenting the experience — the easy answer is three separate tools;
+        the harder, better one is a single flexible system.
+      </p>
+      <p>
+        If I were starting over, I'd push for role-based user testing earlier — some of the
+        sharpest usability issues only surfaced once real property managers were in the flow.
+        That's shaped how I sequence design work now: validate with the most demanding user
+        role first, then simplify outward.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="border-bottom:none;">
+  <div class="wrap">
+    <div class="eyebrow" style="margin-bottom:14px;">More Work</div>
+    <div class="prevnext" id="prevnext">
+      <a class="pn-card" href="case-elpx.html">
+        <div class="eyebrow">← Previous</div>
+        <div class="name">ELPX</div>
+      </a>
+      <a class="pn-card" href="case-shelf21.html">
+        <div class="eyebrow">Next →</div>
+        <div class="name">Shelf21</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer" id="contact">
+  <div class="wrap">
+    <div class="footer-cta">
+      <div class="eyebrow" style="margin-bottom:14px;">Get In Touch</div>
+      <h2>Let's Collaborate</h2>
+    </div>
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="eyebrow">Say hello</div>
+        <a class="footer-email" href="mailto:labodetimi@gmail.com">labodetimi@gmail.com</a>
+        <div class="avail"><span class="dot"></span>Available for work, Lagos, NG</div>
+      </div>
+      <div class="footer-col">
+        <div class="eyebrow">Menu</div>
+        <a href="index.html#work">Featured Work</a>
+        <a href="index.html#playground">Playground</a>
+        <a href="index.html#build">Design & Build</a>
+        <a href="index.html#speaking">About</a>
+      </div>
+      <div class="footer-col">
+        <div class="eyebrow">Connect</div>
+        <a href="https://www.linkedin.com/in/oluwatimilehinlabode/" target="_blank" rel="noopener">LinkedIn ↗</a>
+        <a href="https://www.behance.net/oluwatimilehinlabode" target="_blank" rel="noopener">Behance ↗</a>
+        <a href="https://x.com/iamtiimmy" target="_blank" rel="noopener">X / Twitter ↗</a>
+        <a href="https://www.instagram.com/iamtiimmyy/" target="_blank" rel="noopener">Instagram ↗</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Timmy Labode. All rights reserved</span>
+      <a href="#top" class="mono">Back to top ↑</a>
+    </div>
+  </div>
+</footer>
+
+<div class="lightbox" id="lightbox" aria-hidden="true">
+  <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close preview">&times;</button>
+  <img id="lightboxImg" src="" alt="">
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
+<script>
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxCaption = document.getElementById('lightboxCaption');
+  const lightboxClose = document.getElementById('lightboxClose');
+  function openLightbox(img){
+    lightboxImg.src = img.getAttribute('src');
+    lightboxImg.alt = img.getAttribute('alt') || '';
+    const fig = img.closest('figure');
+    const cap = fig ? fig.querySelector('figcaption') : null;
+    lightboxCaption.textContent = cap ? cap.textContent : '';
+    lightbox.classList.add('open');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox(){
+    lightbox.classList.remove('open');
+    lightbox.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+  document.querySelectorAll('.gallery img').forEach(img => {
+    img.addEventListener('click', () => openLightbox(img));
+  });
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => { if(e.target === lightbox) closeLightbox(); });
+  document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeLightbox(); });
+
+  const themeToggle = document.getElementById('themeToggle');
+  const rootEl = document.documentElement;
+  function applyTheme(t){ rootEl.setAttribute('data-theme', t); localStorage.setItem('theme', t); }
+  applyTheme(localStorage.getItem('theme') || 'light');
+  themeToggle.addEventListener('click', () => applyTheme(rootEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
+
+  const stepLinks = document.querySelectorAll('.stepper a');
+  const sections = Array.from(stepLinks).map(a => document.getElementById(a.dataset.step)).filter(Boolean);
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        stepLinks.forEach(a => a.classList.remove('active'));
+        const match = document.querySelector(`.stepper a[data-step="${e.target.id}"]`);
+        if(match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-40% 0px -50% 0px' });
+  sections.forEach(s => io.observe(s));
+</script>
